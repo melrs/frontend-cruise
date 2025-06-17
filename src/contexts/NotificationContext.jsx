@@ -1,0 +1,88 @@
+import React, { createContext, useState, useContext, useCallback, useEffect } from 'react';
+import { connectToReservationStatusSse, connectToGeneralPromotionsSse, disconnectFromSse } from '../services/sseService';
+
+const NotificationContext = createContext(null);
+
+export const NotificationProvider = ({ children }) => {
+  const [notification, setNotification] = useState(null);
+  const [clientId, setClientId] = useState(localStorage.getItem('clientId') || `${Date.now()}`);
+
+  useEffect(() => {
+    localStorage.setItem('clientId', clientId);
+  }, [clientId]);
+
+  const showNotification = useCallback((message, type = 'info', data = null) => {
+    setNotification({ message, type, data });
+    const timer = setTimeout(() => {
+      setNotification(null);
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const clearNotification = useCallback(() => {
+    setNotification(null);
+  }, []);
+
+  useEffect(() => {
+    if (clientId) {
+      console.log(`Attempting to connect SSE for reservation status for client: ${clientId}`);
+      connectToReservationStatusSse(
+        clientId,
+        (data) => {
+          let message = 'Update received!';
+          let type = 'info';
+          if (data.type === 'payment_approved') {
+            message = `Payment Approved for Transaction ID: ${data.data.transaction_id}`;
+            type = 'success';
+          } else if (data.type === 'payment_declined') {
+            message = `Payment Declined for Transaction ID: ${data.data.transaction_id}`;
+            type = 'error';
+          } else if (data.type === 'ticket_issued') {
+            message = `Ticket Issued! Message: ${data.message}`; // Adjust based on actual data
+            type = 'success';
+          } else if (data.type === 'generic_message') {
+            message = `Generic Reservation Update: ${data.message}`;
+          }
+          showNotification(message, type, data);
+        },
+        (error) => {
+          console.error('SSE Reservation Status Connection Error:', error);
+          showNotification('SSE connection error for reservation status. Please refresh.', 'error');
+        }
+      );
+
+
+      console.log('Attempting to connect SSE for general promotions.');
+      connectToGeneralPromotionsSse(
+        clientId,
+        (data) => {
+          let message = 'New Promotion!';
+          let type = 'info';
+          if (data.type === 'promotion_update') {
+            message = `New Promotion: ${data.message || 'Check out our latest offers!'}`;
+            type = 'info';
+          } else if (data.type === 'generic_promotion_message') {
+            message = `Generic Promotion Update: ${data.message}`;
+          }
+          showNotification(message, type, data);
+        },
+        (error) => {
+          console.error('SSE General Promotions Connection Error:', error);
+          showNotification('SSE connection error for promotions. Please refresh.', 'error');
+        }
+      );
+    }
+
+    return () => {
+      disconnectFromSse();
+    };
+  }, [clientId, showNotification]); // Reconnect if clientId changes
+
+  return (
+    <NotificationContext.Provider value={{ notification, showNotification, clearNotification, clientId }}>
+      {children}
+    </NotificationContext.Provider>
+  );
+};
+
+export const useNotification = () => useContext(NotificationContext);
