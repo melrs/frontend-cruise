@@ -6,10 +6,8 @@ import Notification from './components/Notification';
 import { NotificationProvider, useNotification } from './contexts/NotificationContext';
 
 import Home from './pages/Home';
-import Reserve from './pages/Reserve';
-import CancelReservation from './pages/CancelReservation';
-import Promotions from './pages/Promotions';
-import NotFound from './pages/NotFound';
+import MyReservations from './pages/MyReservations'; 
+import NotFound from './pages/NotFound'; 
 
 function AppContent() {
   const { notification } = useNotification();
@@ -21,10 +19,8 @@ function AppContent() {
       <main className="app-main-content">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/reserve" element={<Reserve />} />
-          <Route path="/cancel" element={<CancelReservation />} />
-          <Route path="/promotions" element={<Promotions />} />
-          <Route path="*" element={<NotFound />} /> {/* Catch-all for undefined routes */}
+          <Route path="/my-reservations" element={<MyReservations />} /> {/* Nova rota */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
       <Footer />
@@ -32,7 +28,6 @@ function AppContent() {
   );
 }
 
-// Wrapper for the whole application with necessary providers
 function App() {
   return (
     <Router>

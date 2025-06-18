@@ -9,8 +9,17 @@
 }
 
 .app-header h1 {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   margin: 0;
   font-size: 1.8em;
+  white-space: nowrap;
+}
+
+.app-header nav {
+  margin-right: auto;
+  margin-left: 150px;
 }
 
 .app-header nav ul {
@@ -19,6 +28,8 @@
   margin: 0;
   display: flex;
   gap: 1.5rem;
+  position: relative;
+  z-index: 10;
 }
 
 .app-header nav ul li a {
@@ -30,6 +41,25 @@
 
 .app-header nav ul li a:hover {
   color: #aed6f1;
+}
+
+.app-header .logo-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: white;
+}
+
+.app-header .logo-container svg {
+  fill: white;
+  width: 30px;
+  height: 30px;
+}
+
+.app-header .logo-container .logo-text {
+  font-size: 1.5em;
+  font-weight: bold;
 }
 
 .client-info {
@@ -55,7 +85,6 @@
   margin-top: auto;
 }
 
-/* General form styles */
 .search-form, .reservation-form, .cancel-form {
   background-color: white;
   padding: 2rem;
@@ -105,12 +134,11 @@ button:disabled {
   cursor: not-allowed;
 }
 
-/* Itinerary card styles for Home.jsx */
 .itineraries-list {
   margin-top: 2rem;
 }
 
-.itinerary-card {
+.card {
   background-color: white;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -119,18 +147,17 @@ button:disabled {
   box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-.itinerary-card h4 {
+.card h4 {
   color: #0056b3;
   margin-top: 0;
   margin-bottom: 0.8rem;
 }
 
-.itinerary-card p {
+.card p {
   margin: 0.4rem 0;
   color: #666;
 }
 
-/* Promotions page styles */
 .promotions-page .button-group {
   display: flex;
   gap: 1rem;
@@ -139,4 +166,110 @@ button:disabled {
 
 .promotions-page .button-group button {
   flex-grow: 1;
+}
+
+.header-right-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+}
+
+.notification-bell-container {
+  position: relative;
+}
+
+.notification-bell-button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.8em;
+  cursor: pointer;
+  position: relative;
+  padding: 0;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification-bell-button svg {
+  fill: currentColor;
+  width: 1em;
+  height: 1em;
+}
+
+.notification-bell-button:hover {
+  opacity: 0.8;
+}
+
+.notification-indicator {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 0.6em;
+  line-height: 1;
+  pointer-events: none;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.notification-history-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  width: 300px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1001;
+  color: #333;
+}
+
+.notification-history-dropdown h3 {
+  margin-top: 0;
+  color: #0056b3;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 5px;
+  margin-bottom: 10px;
+  font-size: 1.1em;
+}
+
+.notification-history-dropdown ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.notification-history-dropdown ul li {
+  padding: 8px 0;
+  border-bottom: 1px dashed #eee;
+  font-size: 0.85em;
+}
+
+.notification-history-dropdown ul li:last-child {
+  border-bottom: none;
+}
+
+.notification-history-dropdown ul li.info { color: #2196F3; }
+.notification-history-dropdown ul li.success { color: #4CAF50; }
+.notification-history-dropdown ul li.error { color: #f44336; }
+
+.notification-history-dropdown .timestamp {
+  font-size: 0.75em;
+  color: #888;
+  display: block;
+  margin-top: 3px;
 }

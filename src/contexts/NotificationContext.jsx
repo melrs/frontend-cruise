@@ -5,6 +5,7 @@ const NotificationContext = createContext(null);
 
 export const NotificationProvider = ({ children }) => {
   const [notification, setNotification] = useState(null);
+  const [notificationHistory, setNotificationHistory] = useState([]);
   const [clientId, setClientId] = useState(localStorage.getItem('clientId') || `${Date.now()}`);
 
   useEffect(() => {
@@ -12,7 +13,14 @@ export const NotificationProvider = ({ children }) => {
   }, [clientId]);
 
   const showNotification = useCallback((message, type = 'info', data = null) => {
-    setNotification({ message, type, data });
+    const newNotification = { id: Date.now(), message, type, data, timestamp: new Date() };
+    setNotification(newNotification);
+
+    setNotificationHistory(prevHistory => {
+      const updatedHistory = [newNotification, ...prevHistory.slice(0, 49)];
+      return updatedHistory;
+    });
+
     const timer = setTimeout(() => {
       setNotification(null);
     }, 5000);
@@ -32,13 +40,13 @@ export const NotificationProvider = ({ children }) => {
           let message = 'Update received!';
           let type = 'info';
           if (data.type === 'payment_approved') {
-            message = `Payment Approved for Transaction ID: ${data.data.transaction_id}`;
+            message = `Payment Approved for Transaction ID: ${data.data.transaction_id || 'N/A'}. Reservation: ${data.data.reservation_id || 'N/A'}`;
             type = 'success';
           } else if (data.type === 'payment_declined') {
-            message = `Payment Declined for Transaction ID: ${data.data.transaction_id}`;
+            message = `Payment Declined for Transaction ID: ${data.data.transaction_id || 'N/A'}. Reservation: ${data.data.reservation_id || 'N/A'}`;
             type = 'error';
           } else if (data.type === 'ticket_issued') {
-            message = `Ticket Issued! Message: ${data.message}`; // Adjust based on actual data
+            message = `Ticket Issued! Message: ${data.message}`;
             type = 'success';
           } else if (data.type === 'generic_message') {
             message = `Generic Reservation Update: ${data.message}`;
@@ -76,10 +84,10 @@ export const NotificationProvider = ({ children }) => {
     return () => {
       disconnectFromSse();
     };
-  }, [clientId, showNotification]); // Reconnect if clientId changes
+  }, [clientId, showNotification]);
 
   return (
-    <NotificationContext.Provider value={{ notification, showNotification, clearNotification, clientId }}>
+    <NotificationContext.Provider value={{ notification, showNotification, clearNotification, clientId, notificationHistory }}>
       {children}
     </NotificationContext.Provider>
   );
